@@ -62,7 +62,7 @@ def load_dataset(data_path: str):
     train_labels = np.load(f"{data_path}/kay_labels.npy")
     val_labels = np.load(f"{data_path}/kay_labels_val.npy")
 
-    all_data["train_labels"] = train_labels
-    all_data["test_labels"] = val_labels
+    all_data["train_labels"] = train_labels.T
+    all_data["test_labels"] = val_labels.T
 
     return all_data
