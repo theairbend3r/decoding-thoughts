@@ -10,6 +10,7 @@ test: ## Run tests
 
 .PHONY: coverage
 coverage: ## Run test coverage
+	coverage erase
 	coverage run -m pytest -v
 	coverage report
 
