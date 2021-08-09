@@ -3,7 +3,5 @@ channels:
   - defaults
 dependencies:
   - python=3.8
-  - black
-  - pytest
   - jupyterlab
 prefix: /home/akshaj/miniconda3/envs/decoding-thoughts
