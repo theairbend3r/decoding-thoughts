@@ -1,1 +1,1 @@
-# decoding-thoughts
+# Decoding Thoughts
