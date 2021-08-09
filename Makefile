@@ -12,6 +12,10 @@ format: ## Run black formatter
 test: ## Run tests
 	pytest -v
 
+.PHONY: docs
+docs: ## Build docs
+	(cd docs && make html)
+
 .PHONY: coverage
 coverage: ## Run test coverage
 	coverage erase
