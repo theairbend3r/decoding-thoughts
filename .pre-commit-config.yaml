@@ -1,5 +1,5 @@
-# See https://pre-commit.com for more information
-# See https://pre-commit.com/hooks.html for more hooks
+exclude: ".git"
+
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v3.2.0
@@ -8,19 +8,27 @@ repos:
       - id: end-of-file-fixer
       - id: check-yaml
       - id: check-added-large-files
-  - repo: local
+  - repo: https://github.com/psf/black
+    rev: 21.7b0
     hooks:
-      - id: lint
-        name: lint
-        entry: make
-        args: ["lint"]
-        language: system
-        pass_filenames: false
-  - repo: local
+      - id: black
+  - repo: https://gitlab.com/pycqa/flake8
+    rev: 3.9.2
     hooks:
-      - id: format
-        name: format
-        entry: make
-        args: ["format"]
-        language: system
-        pass_filenames: false
+      - id: flake8
+  # - repo: local
+  #   hooks:
+  #     - id: lint
+  #       name: lint
+  #       entry: make
+  #       args: ["lint"]
+  #       language: system
+  #       pass_filenames: false
+  # - repo: local
+  #   hooks:
+  #     - id: format
+  #       name: format
+  #       entry: make
+  #       args: ["format"]
+  #       language: system
+  #       pass_filenames: false

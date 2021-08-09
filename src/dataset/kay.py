@@ -4,7 +4,7 @@ Functions to access the dataset.
 
 
 def download_dataset(data_path: str):
-    """Download the kay dataset.
+    """Download the dataset.
 
     Parameters
     ----------
