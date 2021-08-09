@@ -4,6 +4,10 @@
 lint: ## Run flake8 linter
 	flake8
 
+.PHONY: format
+format: ## Run black formatter
+	black .
+
 .PHONY: test
 test: ## Run tests
 	pytest -v
