@@ -57,9 +57,12 @@ def load_dataset(data_path: str):
         download_data(data_path)
 
     with np.load(f"{data_path}/kay_images.npz") as dobj:
-        img_dict = dict(**dobj)
+        all_data = dict(**dobj)
 
     train_labels = np.load(f"{data_path}/kay_labels.npy")
     val_labels = np.load(f"{data_path}/kay_labels_val.npy")
 
-    return img_dict, train_labels, val_labels
+    all_data["train_labels"] = train_labels
+    all_data["val_labels"] = val_labels
+
+    return all_data
