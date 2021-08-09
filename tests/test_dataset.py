@@ -1,4 +1,4 @@
-from src.data.dataset import load_dataset
+from src.dataset.kay import load_dataset
 
 
 def test_load_dataset():
