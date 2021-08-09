@@ -50,7 +50,6 @@ def load_dataset(data_path: str):
     ----------
     data_path: str
         Path to load the dataset from.
-
     """
     # download data if not already present.
     if len(os.listdir(data_path)) == 0:
