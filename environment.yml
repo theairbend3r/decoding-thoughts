@@ -4,4 +4,7 @@ channels:
 dependencies:
   - python=3.8
   - jupyterlab
+  - jupyterlab-git
+  - jupyterlab_widgets
+  - ipywidgets
 prefix: /home/akshaj/miniconda3/envs/decoding-thoughts
