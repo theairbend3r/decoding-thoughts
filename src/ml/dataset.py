@@ -57,6 +57,18 @@ class StimulusDataset(Dataset):
 
 
 def calculate_mean_std(dataset):
+    """Calculate dataset mean and standard deviation.
+
+    Parameters
+    ----------
+    dataset:
+        Pytorch dataset object.
+
+    Returns
+    -------
+    tuple
+        A tuple that consists a tuple of mean and std for 3 channels (mean, std).
+    """
 
     data_loader = DataLoader(dataset=dataset, shuffle=False, batch_size=1)
 

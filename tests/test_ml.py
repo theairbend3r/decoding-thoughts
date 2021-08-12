@@ -1,7 +1,10 @@
 import torch
 import numpy as np
-from torchvision import transforms
-from src.ml.dataset import StimulusDataset
+
+import albumentations as A
+from albumentations.pytorch import ToTensorV2
+
+from src.ml.dataset import StimulusDataset, calculate_mean_std
 from src.ml.model import StimulusClassifier
 from src.ml.utils import calc_multi_acc
 
@@ -9,22 +12,18 @@ num_output_classes = 10
 x = np.random.randint(low=0, high=255, size=(1300, 128, 128))
 y = np.random.randint(low=0, high=num_output_classes, size=(1300,))
 
-dataset_mean = 0.5
-dataset_std = 0.5
+dataset_mean = 0.5, 0.5, 0.5
+dataset_std = 0.5, 0.5, 0.5
 
 img_transform = {
-    "train": transforms.Compose(
-        [transforms.ToTensor(), transforms.Normalize(dataset_mean, dataset_std)]
-    ),
-    "test": transforms.Compose(
-        [transforms.ToTensor(), transforms.Normalize(dataset_mean, dataset_std)]
-    ),
+    "train": A.Compose([A.Normalize(mean=dataset_mean, std=dataset_std), ToTensorV2()]),
+    "test": A.Compose([A.Normalize(mean=dataset_mean, std=dataset_std), ToTensorV2()]),
 }
 
 class2idx = {k: i for i, k in enumerate(np.unique(y))}
 idx2class = {v: k for k, v in class2idx.items()}
 
-x_tensor = torch.rand((32, 1, 128, 128))
+x_tensor = torch.rand((32, 3, 128, 128))
 y_tensor = torch.rand((32, 1))
 
 y_pred = torch.tensor(
@@ -45,10 +44,20 @@ class TestDataset:
 
         assert type(stimulus_dataset[0]) == tuple
 
+    def calculate_mean_std(self):
+        stimulus_dataset = StimulusDataset(
+            x_img=x,
+            y_lbl=y,
+            img_transform=img_transform["train"],
+            class2idx=class2idx,
+        )
+
+        assert type(calculate_mean_std(stimulus_dataset)) == tuple
+
 
 class TestModel:
     def test_stimulus_model(self):
-        stimulus_model = StimulusClassifier(num_classes=len(class2idx))
+        stimulus_model = StimulusClassifier(num_channel=3, num_classes=len(class2idx))
 
         assert stimulus_model(x_tensor).shape == (32, len(class2idx))
 
