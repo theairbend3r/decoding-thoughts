@@ -14,7 +14,7 @@ test: ## Run tests
 
 .PHONY: docs
 docs: ## Build docs
-	(cd docs && make html)
+	(cd docs && make clean && rm -rf _autosummary && make html)
 
 .PHONY: coverage
 coverage: ## Run test coverage
