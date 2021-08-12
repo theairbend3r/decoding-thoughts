@@ -10,11 +10,11 @@ class StimulusClassifier(nn.Module):
         Number of output classes.
     """
 
-    def __init__(self, num_classes):
+    def __init__(self, num_channel, num_classes):
         super(StimulusClassifier, self).__init__()
 
         self.block1 = self.conv_block(
-            c_in=1, c_out=32, kernel_size=3, stride=1, padding=1
+            c_in=num_channel, c_out=32, kernel_size=3, stride=1, padding=1
         )
         self.block2 = self.conv_block(
             c_in=32, c_out=64, kernel_size=3, stride=1, padding=1

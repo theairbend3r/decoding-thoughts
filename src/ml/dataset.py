@@ -1,8 +1,9 @@
 import numpy as np
 from PIL import Image
+from tqdm.notebook import tqdm
 
 import torch
-from torch.utils.data import Dataset
+from torch.utils.data import Dataset, DataLoader
 
 
 class StimulusDataset(Dataset):
@@ -42,14 +43,35 @@ class StimulusDataset(Dataset):
         self.class2idx = class2idx
 
     def __getitem__(self, idx):
-        x = Image.fromarray(self.x_img[idx].astype(np.uint8))
+        x = Image.fromarray(self.x_img[idx].astype(np.uint8)).convert("RGB")
         y = torch.tensor(self.class2idx[self.y_lbl[idx]], dtype=torch.long)
 
         if self.img_transform:
-            x = self.img_transform(x)
+            x = self.img_transform(image=np.array(x))["image"]
 
         return x, y
 
     def __len__(self):
         assert len(self.x_img) == len(self.y_lbl)
         return len(self.x_img)
+
+
+def calculate_mean_std(dataset):
+
+    data_loader = DataLoader(dataset=dataset, shuffle=False, batch_size=1)
+
+    img_size = dataset[0][0].shape[1]
+
+    pixel_sum = torch.tensor([0.0, 0.0, 0.0])
+    pixel_sum_squared = torch.tensor([0.0, 0.0, 0.0])
+
+    for img, _ in tqdm(data_loader):
+        pixel_sum += img.sum(axis=[0, 2, 3])
+        pixel_sum_squared += (img ** 2).sum(axis=[0, 2, 3])
+
+    total_num_pixels = img_size * img_size * len(data_loader)
+    total_mean = pixel_sum / total_num_pixels
+    total_var = (pixel_sum_squared / total_num_pixels) - (total_mean ** 2)
+    total_std = torch.sqrt(total_var)
+
+    return total_mean, total_std
