@@ -5,15 +5,15 @@ Utility functions.
 import numpy as np
 
 
-def filter_by_roi(all_data: dict, roi: int) -> np.ndarray:
-    """Filter data by voxel roi.
+def filter_voxel_by_roi(all_data: dict, roi_list: list) -> np.ndarray:
+    """Filter voxel data based on roi.
 
     Parameters
     ----------
     all_data:
         Dictionary of numpy arrays which contains all data.
     roi:
-        Integer denoting the roi type. Values lie between [1, 7].
+        List of integers denoting the roi type. Values lie between [1, 7].
 
     Returns
     -------
@@ -25,10 +25,16 @@ def filter_by_roi(all_data: dict, roi: int) -> np.ndarray:
     ValueError
         If `roi` does not lie between [1, 7].
     """
-    if roi not in range(1, 8):
-        raise ValueError("roi should like between [1, 7].")
+    for i in roi_list:
+        if i not in range(1, 8):
+            raise ValueError("roi should lie between [1, 7].")
 
-    return np.where(all_data["roi"] == roi)[0]
+    final_idx_list = []
+    for i in roi_list:
+        idx_list = np.where(all_data["roi"] == i)[0]
+        final_idx_list.extend(idx_list.tolist())
+
+    return np.where(final_idx_list)[0]
 
 
 def convert_arr_to_img(stimulus_img_arr: np.ndarray) -> np.ndarray:
@@ -110,7 +116,7 @@ def filter_data_by_class(
     return bool_idx_arr
 
 
-def prepare_data_arrays(
+def prepare_stimulus_data(
     all_data: dict, data_subset: str, class_ignore_list: list, label_level: int
 ) -> tuple:
     """Prepare data for modelling.
@@ -162,5 +168,72 @@ def prepare_data_arrays(
 
     x = convert_arr_to_img(stimulus_img_arr=all_data[x_key][bool_idx])
     y = all_data[y_key][:, 0][bool_idx]
+
+    return x, y
+
+
+def prepare_fmri_data(
+    all_data: dict,
+    data_subset: str,
+    class_ignore_list: list,
+    label_level: int,
+    roi_select_list: list,
+) -> tuple:
+    """Prepare data for modelling.
+
+    First filters data by class. Then rescales the image to [0-255] scale.
+
+    Parameters
+    ----------
+    all_data:
+        Dictionary of numpy arrays which contains all data.
+    data_subset:
+        A string value that denotes the train/test subset. Can only
+        be "train" or "test".
+    class_ignore_list:
+        A list of class labels to ignore.
+    label_level:
+        An integer that denotes the label hierarchy level.
+        Lies between [0,3].
+    roi_select_list:
+        List of integers that contain the roi id to use.
+
+
+    Returns
+    -------
+    tuple
+        A tuple of numpy arrays which contains image and output class labels.
+
+    Raises
+    ------
+    ValueError
+        If `label_level` does not lie between [0, 3].
+    """
+
+    if label_level not in range(0, 4):
+        raise ValueError("label_level can only be 0, 1, 2, or 3.")
+
+    if data_subset not in ["train", "test"]:
+        raise ValueError("data_subset can only be 'train' or 'test'.")
+
+    if len(class_ignore_list) == 0:
+        raise ValueError("class_ignore_list must have atleast 1 element.")
+
+    bool_idx = filter_data_by_class(
+        all_data=all_data,
+        data_subset=data_subset,
+        class_ignore_list=class_ignore_list,
+        label_level=label_level,
+    )
+
+    x_key = "responses" if data_subset == "train" else "responses_test"
+    y_key = "train_labels" if data_subset == "train" else "test_labels"
+
+    x = all_data[x_key][bool_idx]
+    y = all_data[y_key][:, 0][bool_idx]
+
+    # filter voxels
+    roi_idx = filter_voxel_by_roi(all_data=all_data, roi_list=roi_select_list)
+    x = x[:, roi_idx]
 
     return x, y

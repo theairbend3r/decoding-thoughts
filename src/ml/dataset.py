@@ -87,3 +87,41 @@ def calculate_mean_std(dataset):
     total_std = torch.sqrt(total_var)
 
     return total_mean, total_std
+
+
+class FMRIDataset(Dataset):
+    """Torch dataset for stimulus images.
+
+    Parameters
+    ----------
+    x_data:
+        A 2-d numpy array of input fmri data.
+    y_data:
+        A 1-d numpy array of output class labels.
+    class2idx:
+        A dictionary that maps class string to integers.
+
+    Attributes
+    ----------
+    x_data:
+        A 2-d numpy array of input fmri data.
+    y_data:
+        A 1-d numpy array of output class labels.
+    class2idx:
+        A dictionary that maps class string to integers.
+    """
+
+    def __init__(self, x_data: np.ndarray, y_data: np.ndarray, class2idx: dict):
+        self.class2idx = class2idx
+        self.x_data = x_data
+        self.y_data = y_data
+
+    def __getitem__(self, idx):
+        x = torch.tensor(self.x_data, dtype=torch.float)[idx]
+        y = torch.tensor(self.class2idx[self.y_data[idx]], dtype=torch.long)
+
+        return x, y
+
+    def __len__(self):
+        assert len(self.x_data) == len(self.y_data)
+        return len(self.x_data)

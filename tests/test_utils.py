@@ -1,11 +1,11 @@
 import pytest
 import numpy as np
 
-from src.utils.utils import (
-    filter_by_roi,
+from src.utils.util import (
+    filter_data_by_roi,
     convert_arr_to_img,
     filter_data_by_class,
-    prepare_data_arrays,
+    prepare_stimulus_data,
 )
 
 all_data_info = {
@@ -26,12 +26,12 @@ for k in all_data_info.keys():
 
 
 class TestUtils:
-    def test_filter_by_roi(self):
+    def test_filter_data_by_roi(self):
         # roi can lie between [1, 7]
         with pytest.raises(ValueError):
-            filter_by_roi(all_data=dummy_data, roi=10)
+            filter_data_by_roi(all_data=dummy_data, roi=10)
 
-        assert type(filter_by_roi(all_data=dummy_data, roi=1)) == np.ndarray
+        assert type(filter_data_by_roi(all_data=dummy_data, roi=1)) == np.ndarray
 
     def test_convert_arr_to_img(self):
         # output is a numpy array
@@ -90,7 +90,7 @@ class TestUtils:
     def test_prepare_data_arrays(self):
         # label level can lies between [0, 3]
         with pytest.raises(ValueError):
-            prepare_data_arrays(
+            prepare_stimulus_data(
                 all_data=dummy_data,
                 data_subset="train",
                 class_ignore_list=["fungus"],
@@ -99,7 +99,7 @@ class TestUtils:
 
         # data_subset can take values - "train" or "test"
         with pytest.raises(ValueError):
-            prepare_data_arrays(
+            prepare_stimulus_data(
                 all_data=dummy_data,
                 data_subset="xyz",
                 class_ignore_list=["fungus"],
@@ -108,7 +108,7 @@ class TestUtils:
 
         # ignore_class_list must have atleast 1 value
         with pytest.raises(ValueError):
-            prepare_data_arrays(
+            prepare_stimulus_data(
                 all_data=dummy_data,
                 data_subset="train",
                 class_ignore_list=[],
@@ -118,7 +118,7 @@ class TestUtils:
         # output is a tuple
         assert (
             type(
-                prepare_data_arrays(
+                prepare_stimulus_data(
                     all_data=dummy_data,
                     data_subset="test",
                     class_ignore_list=["person", "fungus", "plant"],
