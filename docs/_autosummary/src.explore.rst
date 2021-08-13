@@ -1,7 +1,7 @@
-﻿src
-===
+src.explore
+===========
 
-.. automodule:: src
+.. automodule:: src.explore
 
 
 
@@ -26,7 +26,4 @@
    :template: custom-module-template.rst
    :recursive:
 
-   src.dataset
-   src.explore
-   src.ml
-   src.utils
+   src.explore.summary

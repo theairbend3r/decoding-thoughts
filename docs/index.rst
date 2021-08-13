@@ -5,19 +5,13 @@
    :hidden:
 
    Home page <self>
-   API reference <_autosummary/app>
+   API reference <_autosummary/src>
+
 
 Welcome to Decoding Thought's documentation!
 ============================================
 
-.. .. image:: https://readthedocs.org/projects/spiking-brains/badge/?version=latest
-..    :target: https://spiking-brains.readthedocs.io/en/latest/?badge=latest
-..    :alt: Documentation Status
-
 Decoding visual stimulus from brain fMRI using methods from computational neuroscience and deep learning.
-
-.. .. figure:: ../assets/spiking-brains.png
-..    :alt: Spiking Brains
 
 
 Content
@@ -59,7 +53,7 @@ Install packages.
 
 .. code:: sh
 
-   pip install requirements.txt
+   pip install -r requirements.txt
 
 Meta
 ----

@@ -2,13 +2,7 @@ import torch.nn as nn
 
 
 class StimulusClassifier(nn.Module):
-    """Torch model to classify stimulus images.
-
-    Parameters
-    ----------
-    num_classes:
-        Number of output classes.
-    """
+    """Torch cnn model."""
 
     def __init__(self, num_channel, num_classes):
         super(StimulusClassifier, self).__init__()

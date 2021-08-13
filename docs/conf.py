@@ -13,7 +13,7 @@
 import os
 import sys
 
-sys.path.insert(0, os.path.abspath("../"))
+sys.path.insert(0, os.path.abspath(".."))
 
 
 # -- Project information -----------------------------------------------------
@@ -66,7 +66,9 @@ templates_path = ["_templates"]
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
-
+# To prevent error during `make html` caused by `import torch`
+# https://github.com/sphinx-doc/sphinx/issues/6521
+autodoc_mock_imports = ["torch"]
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for

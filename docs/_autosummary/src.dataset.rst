@@ -1,7 +1,7 @@
-﻿src
-===
+src.dataset
+===========
 
-.. automodule:: src
+.. automodule:: src.dataset
 
 
 
@@ -26,7 +26,4 @@
    :template: custom-module-template.rst
    :recursive:
 
-   src.dataset
-   src.explore
-   src.ml
-   src.utils
+   src.dataset.kay
