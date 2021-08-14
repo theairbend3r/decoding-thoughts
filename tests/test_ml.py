@@ -5,19 +5,21 @@ import albumentations as A
 from albumentations.pytorch import ToTensorV2
 
 from src.ml.utils import calc_multi_acc
-from src.ml.model import StimulusClassifier
+from src.ml.model import FMRIClassifier, StimulusClassifier
 from src.ml.dataset import FMRIDataset, StimulusDataset, calculate_mean_std
 
-
+img_size = 128
 batch_size = 32
 num_output_classes = 10
-
+num_input_samples = 1750
+num_input_fmri_features = 5000
+num_input_img_channels = 3
 
 ####################################
 # Classification Output Data
 ####################################
 
-y_lbl = np.random.randint(low=0, high=num_output_classes, size=(1300,))
+y_lbl = np.random.randint(low=0, high=num_output_classes, size=(num_input_samples,))
 
 y_pred = torch.tensor(
     [[0.1218, 0.2507, 0.3613, 0.0625, 0.1943], [0.2231, 0.8644, 0.1703, 0.2545, 0.4967]]
@@ -34,7 +36,9 @@ idx2class = {v: k for k, v in class2idx.items()}
 ####################################
 
 # prepare_stimulus_data() output
-x_img = np.random.randint(low=0.0, high=255.0, size=(1300, 128, 128))
+x_img = np.random.randint(
+    low=0.0, high=255.0, size=(num_input_samples, img_size, img_size)
+)
 
 img_transform = {
     "train": A.Compose(
@@ -50,12 +54,20 @@ img_transform = {
 ####################################
 
 # prepare_fmri_data() output
-x_fmri = np.random.randint(low=-1.0, high=1.0, size=(1300, 8000))
+x_fmri = np.random.randint(
+    low=-1.0, high=1.0, size=(num_input_samples, num_input_fmri_features)
+)
 
 
-# pytorch dataloader output
+####################################
+# Pytorch Dataloader Output
+####################################
 # (batch, channel, height, width)
-x_tensor = torch.rand((batch_size, 3, 128, 128))
+x_img_tensor = torch.rand((batch_size, num_input_img_channels, img_size, img_size))
+
+# (batch_size, num_features)
+x_fmri_tensor = torch.rand((batch_size, num_input_fmri_features))
+
 # (batch,)
 y_tensor = torch.rand((batch_size, 1))
 
@@ -129,13 +141,26 @@ class TestDataset:
 
 class TestModel:
     def test_stimulus_model(self):
-        stimulus_model = StimulusClassifier(num_channel=3, num_classes=len(class2idx))
+        stimulus_model = StimulusClassifier(
+            num_channel=3, num_classes=num_output_classes
+        )
 
         # model output shape should be (batch_size, num_classes)
-        assert stimulus_model(x_tensor).shape == (batch_size, len(class2idx))
+        assert stimulus_model(x_img_tensor).shape == (batch_size, num_output_classes)
 
         # model output should be a tensor
-        assert stimulus_model(x_tensor).shape == (batch_size, len(class2idx))
+        assert stimulus_model(x_img_tensor).shape == (batch_size, num_output_classes)
+
+    def test_fmri_model(self):
+        fmri_model = FMRIClassifier(
+            num_features=num_input_fmri_features, num_classes=num_output_classes
+        )
+
+        # model output shape should be (batch_size, num_classes)
+        assert fmri_model(x_fmri_tensor).shape == (batch_size, num_output_classes)
+
+        # model output should be a tensor
+        assert fmri_model(x_fmri_tensor).shape == (batch_size, num_output_classes)
 
 
 class TestUtils:
