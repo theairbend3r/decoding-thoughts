@@ -7,4 +7,5 @@ dependencies:
   - jupyterlab-git
   - jupyterlab_widgets
   - ipywidgets
+  - jupyterlab_code_formatter
 prefix: /home/akshaj/miniconda3/envs/decoding-thoughts
