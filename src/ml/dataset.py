@@ -11,9 +11,9 @@ class StimulusDataset(Dataset):
 
     Parameters
     ----------
-    x_img:
+    x_data:
         A 3-d numpy array of input stimulus image.
-    y_lbl:
+    y_data:
         A 1-d numpy array of output class labels.
         be "train" or "test".
     img_transforms:
@@ -23,9 +23,9 @@ class StimulusDataset(Dataset):
 
     Attributes
     ----------
-    x_img: np.ndarray
+    x_data: np.ndarray
         A 3-d numpy array of input stimulus image.
-    y_lbl: np.ndarray
+    y_data: np.ndarray
         A 1-d numpy array of output class labels.
         be "train" or "test".
     img_transforms: dict
@@ -35,16 +35,20 @@ class StimulusDataset(Dataset):
     """
 
     def __init__(
-        self, x_img: np.ndarray, y_lbl: np.ndarray, img_transform: dict, class2idx: dict
+        self,
+        x_data: np.ndarray,
+        y_data: np.ndarray,
+        img_transform: dict,
+        class2idx: dict,
     ):
-        self.x_img = x_img
-        self.y_lbl = y_lbl
+        self.x_data = x_data
+        self.y_data = y_data
         self.img_transform = img_transform
         self.class2idx = class2idx
 
     def __getitem__(self, idx):
-        x = Image.fromarray(self.x_img[idx].astype(np.uint8)).convert("RGB")
-        y = torch.tensor(self.class2idx[self.y_lbl[idx]], dtype=torch.long)
+        x = Image.fromarray(self.x_data[idx].astype(np.uint8)).convert("RGB")
+        y = torch.tensor(self.class2idx[self.y_data[idx]], dtype=torch.long)
 
         if self.img_transform:
             x = self.img_transform(image=np.array(x))["image"]
@@ -52,11 +56,11 @@ class StimulusDataset(Dataset):
         return x, y
 
     def __len__(self):
-        assert len(self.x_img) == len(self.y_lbl)
-        return len(self.x_img)
+        assert len(self.x_data) == len(self.y_data)
+        return len(self.x_data)
 
 
-def calculate_mean_std(dataset):
+def calculate_mean_std(dataset: Dataset):
     """Calculate dataset mean and standard deviation.
 
     Parameters
@@ -90,7 +94,7 @@ def calculate_mean_std(dataset):
 
 
 class FMRIDataset(Dataset):
-    """Torch dataset for stimulus images.
+    """Torch dataset for fMRI data.
 
     Parameters
     ----------
