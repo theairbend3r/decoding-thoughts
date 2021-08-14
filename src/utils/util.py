@@ -5,6 +5,42 @@ Utility functions.
 import numpy as np
 
 
+def convert_arr_to_img(stimulus_img_arr: np.ndarray) -> np.ndarray:
+    """Change the range of a normalized image to [0-255].
+
+    Parameters
+    ----------
+    stimulus_img_arr:
+        Normalized image array.
+
+    Returns
+    -------
+    np.ndarray
+        Un-normalized image array.
+
+    Raises
+    ------
+    ValueError
+        If `stimulus_img_arr` is not a numpy array.
+    """
+
+    # Change scale of stimulus to [0-255]
+    img_transformed = np.zeros(
+        (
+            stimulus_img_arr.shape[0],
+            stimulus_img_arr.shape[1],
+            stimulus_img_arr.shape[2],
+        )
+    )
+
+    for i in range(stimulus_img_arr.shape[0]):
+        img = stimulus_img_arr[i, :, :]
+        img = ((img - np.min(img)) * 255 / (np.max(img) - np.min(img))).astype(int)
+        img_transformed[i, :, :] = img
+
+    return img_transformed
+
+
 def filter_voxel_by_roi(all_data: dict, roi_list: list) -> np.ndarray:
     """Filter voxel data based on roi.
 
@@ -12,7 +48,7 @@ def filter_voxel_by_roi(all_data: dict, roi_list: list) -> np.ndarray:
     ----------
     all_data:
         Dictionary of numpy arrays which contains all data.
-    roi:
+    roi_list:
         List of integers denoting the roi type. Values lie between [1, 7].
 
     Returns
@@ -37,36 +73,7 @@ def filter_voxel_by_roi(all_data: dict, roi_list: list) -> np.ndarray:
     return np.where(final_idx_list)[0]
 
 
-def convert_arr_to_img(stimulus_img_arr: np.ndarray) -> np.ndarray:
-    """Change the range of a normalized image to [0-255].
-
-    Parameters
-    ----------
-    stimulus_img_arr:
-        Normalized image array.
-
-    Returns
-    -------
-    np.ndarray
-        Un-normalized image array.
-
-    Raises
-    ------
-    ValueError
-        If `stimulus_img_arr` is not a numpy array.
-    """
-
-    # Change scale of stimulus to [0-255]
-    img_transformed = np.zeros((stimulus_img_arr.shape[0], 128, 128))
-    for i in range(stimulus_img_arr.shape[0]):
-        img = stimulus_img_arr[i, :, :]
-        img = ((img - np.min(img)) * 255 / (np.max(img) - np.min(img))).astype(int)
-        img_transformed[i, :, :] = img
-
-    return img_transformed
-
-
-def filter_data_by_class(
+def filter_stimulus_by_class(
     all_data: dict, data_subset: str, class_ignore_list: list, label_level: int
 ) -> np.ndarray:
     """Filter data by output class label.
@@ -156,7 +163,7 @@ def prepare_stimulus_data(
     if len(class_ignore_list) == 0:
         raise ValueError("class_ignore_list must have atleast 1 element.")
 
-    bool_idx = filter_data_by_class(
+    bool_idx = filter_stimulus_by_class(
         all_data=all_data,
         data_subset=data_subset,
         class_ignore_list=class_ignore_list,
@@ -219,7 +226,7 @@ def prepare_fmri_data(
     if len(class_ignore_list) == 0:
         raise ValueError("class_ignore_list must have atleast 1 element.")
 
-    bool_idx = filter_data_by_class(
+    bool_idx = filter_stimulus_by_class(
         all_data=all_data,
         data_subset=data_subset,
         class_ignore_list=class_ignore_list,
