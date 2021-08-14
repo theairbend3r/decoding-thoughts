@@ -16,15 +16,31 @@ class StimulusClassifier(nn.Module):
             self.conv_block(c_in=8, c_out=8, kernel_size=3, stride=1, padding=1),
             self.conv_block(c_in=8, c_out=16, kernel_size=3, stride=1, padding=1),
         )
-        self.block2 = self.conv_block(
-            c_in=16, c_out=32, kernel_size=3, stride=1, padding=1
+
+        self.block2 = nn.Sequential(
+            self.conv_block(c_in=16, c_out=16, kernel_size=3, stride=1, padding=1),
+            self.conv_block(c_in=16, c_out=16, kernel_size=3, stride=1, padding=1),
+            self.conv_block(c_in=16, c_out=16, kernel_size=3, stride=1, padding=1),
+            self.conv_block(c_in=16, c_out=16, kernel_size=3, stride=1, padding=1),
+            self.conv_block(c_in=16, c_out=32, kernel_size=3, stride=1, padding=1),
         )
-        self.block3 = self.conv_block(
-            c_in=32, c_out=64, kernel_size=3, stride=1, padding=1
+
+        self.block3 = nn.Sequential(
+            self.conv_block(c_in=32, c_out=32, kernel_size=3, stride=1, padding=1),
+            self.conv_block(c_in=32, c_out=32, kernel_size=3, stride=1, padding=1),
+            self.conv_block(c_in=32, c_out=32, kernel_size=3, stride=1, padding=1),
+            self.conv_block(c_in=32, c_out=32, kernel_size=3, stride=1, padding=1),
+            self.conv_block(c_in=32, c_out=64, kernel_size=3, stride=1, padding=1),
         )
-        self.block4 = self.conv_block(
-            c_in=64, c_out=128, kernel_size=3, stride=1, padding=1
+
+        self.block4 = nn.Sequential(
+            self.conv_block(c_in=64, c_out=64, kernel_size=3, stride=1, padding=1),
+            self.conv_block(c_in=64, c_out=64, kernel_size=3, stride=1, padding=1),
+            self.conv_block(c_in=64, c_out=64, kernel_size=3, stride=1, padding=1),
+            self.conv_block(c_in=64, c_out=64, kernel_size=3, stride=1, padding=1),
+            self.conv_block(c_in=64, c_out=128, kernel_size=3, stride=1, padding=1),
         )
+
         self.fc = nn.Linear(in_features=8 * 8 * 128, out_features=num_classes)
 
         self.maxpool = nn.MaxPool2d(kernel_size=2, stride=2)
@@ -62,8 +78,8 @@ class FMRIClassifier(nn.Module):
     def __init__(self, num_features, num_classes):
         super(FMRIClassifier, self).__init__()
 
-        self.block_1 = self.lin_block(f_in=num_features, f_out=32)
-        self.block_2 = self.lin_block(f_in=32, f_out=num_classes)
+        self.block_1 = self.lin_block(f_in=num_features, f_out=64)
+        self.block_2 = self.lin_block(f_in=64, f_out=num_classes)
 
     def forward(self, x):
         x = self.block_1(x)
@@ -74,7 +90,6 @@ class FMRIClassifier(nn.Module):
     def lin_block(self, f_in, f_out):
         return nn.Sequential(
             nn.Linear(in_features=f_in, out_features=f_out),
-            nn.BatchNorm1d(num_features=f_out),
             nn.ReLU(),
             nn.Dropout2d(p=0.5),
         )
