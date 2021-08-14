@@ -34,16 +34,6 @@ y_true = torch.tensor([2, 1], dtype=torch.long)
 
 
 class TestDataset:
-    def test_stimulus_dataset(self):
-        stimulus_dataset = StimulusDataset(
-            x_img=x,
-            y_lbl=y,
-            img_transform=img_transform["train"],
-            class2idx=class2idx,
-        )
-
-        assert type(stimulus_dataset[0]) == tuple
-
     def calculate_mean_std(self):
         stimulus_dataset = StimulusDataset(
             x_img=x,
@@ -53,6 +43,17 @@ class TestDataset:
         )
 
         assert type(calculate_mean_std(stimulus_dataset)) == tuple
+        assert type(calculate_mean_std(stimulus_dataset)) == tuple
+
+    def test_stimulus_dataset(self):
+        stimulus_dataset = StimulusDataset(
+            x_img=x,
+            y_lbl=y,
+            img_transform=img_transform["train"],
+            class2idx=class2idx,
+        )
+
+        assert type(stimulus_dataset[0]) == tuple
 
 
 class TestModel:
