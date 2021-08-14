@@ -116,6 +116,8 @@ def filter_stimulus_by_class(
 
     bool_idx_arr = np.ones_like(all_data[key][:, label_level], dtype="bool")
 
+    # filter boolean idx and perform element-wise multiplication to
+    # obtain the resultant boolean idx.
     for i in range(len(class_ignore_list)):
         bool_idx = all_data[key][:, label_level] != class_ignore_list[i]
         bool_idx_arr = bool_idx_arr * bool_idx
@@ -146,12 +148,16 @@ def prepare_stimulus_data(
     Returns
     -------
     tuple
-        A tuple of numpy arrays which contains image and output class labels.
+        A tuple of 2d numpy arrays which contains input image and output class labels.
 
     Raises
     ------
     ValueError
         If `label_level` does not lie between [0, 3].
+    ValueError
+        If `data_subset` does not contain either "train" or "test".
+    ValueError
+        If `class_ignore_list` is empty.
     """
 
     if label_level not in range(0, 4):
@@ -203,7 +209,7 @@ def prepare_fmri_data(
         An integer that denotes the label hierarchy level.
         Lies between [0,3].
     roi_select_list:
-        List of integers that contain the roi id to use.
+        List of integers between [1, 7] that contain the roi id to use.
 
 
     Returns
@@ -215,6 +221,10 @@ def prepare_fmri_data(
     ------
     ValueError
         If `label_level` does not lie between [0, 3].
+    ValueError
+        If `data_subset` does not contain either "train" or "test".
+    ValueError
+        If `class_ignore_list` is empty.
     """
 
     if label_level not in range(0, 4):

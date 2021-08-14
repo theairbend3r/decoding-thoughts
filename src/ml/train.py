@@ -1,17 +1,19 @@
 import torch
+import torch.nn as nn
+from torch.utils.data import DataLoader
 
 from tqdm.notebook import tqdm
 from src.ml.utils import calc_multi_acc, print_log
 
 
 def train_model(
-    model,
-    epochs,
-    train_loader,
-    val_loader,
+    model: nn.Module,
+    epochs: int,
+    train_loader: DataLoader,
+    val_loader: DataLoader,
     optimizer,
     criterion,
-    device,
+    device: str,
 ):
     """Training loop.
 

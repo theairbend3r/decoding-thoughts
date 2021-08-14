@@ -1,8 +1,11 @@
 import torch
+import torch.nn as nn
+from torch.utils.data import DataLoader
+
 from tqdm.notebook import tqdm
 
 
-def test_model(model, test_loader, device):
+def test_model(model: nn.Module, test_loader: DataLoader, device: str):
     """Testing loop.
 
     model:

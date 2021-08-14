@@ -1,23 +1,8 @@
 import pytest
+from tests.dummy_data import dummy_data
+
 import numpy as np
-
 from src.explore.summary import plot_hierarchical_labels
-
-all_data_info = {
-    "stimuli": (1750, 128, 128),
-    "stimuli_test": (120, 128, 128),
-    "responses": (1750, 8428),
-    "responses_test": (120, 8428),
-    "roi": (8428,),
-    "roi_names": (8,),
-    "train_labels": (1750, 4),
-    "test_labels": (120, 4),
-}
-
-dummy_data = {k: None for k in all_data_info.keys()}
-
-for k in all_data_info.keys():
-    dummy_data[k] = np.random.random_sample(size=(all_data_info[k]))
 
 
 class TestSummary:
