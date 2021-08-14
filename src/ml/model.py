@@ -56,9 +56,38 @@ class StimulusClassifier(nn.Module):
         )
 
 
+class FMRIClassifier(nn.Module):
+    """Torch dnn model."""
+
+    def __init__(self, num_features, num_classes):
+        super(FMRIClassifier, self).__init__()
+
+        self.block_1 = self.lin_block(f_in=num_features, f_out=32)
+        self.block_2 = self.lin_block(f_in=32, f_out=num_classes)
+
+    def forward(self, x):
+        x = self.block_1(x)
+        x = self.block_2(x)
+
+        return x
+
+    def lin_block(self, f_in, f_out):
+        return nn.Sequential(
+            nn.Linear(in_features=f_in, out_features=f_out),
+            nn.BatchNorm1d(num_features=f_out),
+            nn.ReLU(),
+            nn.Dropout2d(p=0.5),
+        )
+
+
 if __name__ == "__main__":
     from torchinfo import summary
 
-    model = StimulusClassifier(num_channel=3, num_classes=5)
+    stim_model = StimulusClassifier(num_channel=3, num_classes=5)
+    fmri_model = FMRIClassifier(num_features=8000, num_classes=5)
     batch_size = 16
-    print(summary(model, input_size=(batch_size, 3, 128, 128)))
+    print(summary(stim_model, input_size=(batch_size, 3, 128, 128)))
+    print()
+    print("=" * 50)
+    print()
+    print(summary(fmri_model, input_size=(batch_size, 8000)))
