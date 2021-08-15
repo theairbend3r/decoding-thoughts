@@ -1,3 +1,4 @@
+import torch
 import torch.nn as nn
 
 
@@ -41,7 +42,8 @@ class StimulusClassifier(nn.Module):
             self.conv_block(c_in=64, c_out=128, kernel_size=3, stride=1, padding=1),
         )
 
-        self.fc = nn.Linear(in_features=8 * 8 * 128, out_features=num_classes)
+        self.fc1 = nn.Linear(in_features=8 * 8 * 128, out_features=64)
+        self.fc2 = nn.Linear(in_features=64, out_features=num_classes)
 
         self.maxpool = nn.MaxPool2d(kernel_size=2, stride=2)
 
@@ -59,7 +61,33 @@ class StimulusClassifier(nn.Module):
         x = self.maxpool(x)
 
         x = x.flatten(start_dim=1)
-        x = self.fc(x)
+        x = self.fc1(x)
+        x = self.fc2(x)
+
+        return x
+
+    def predict(self, x):
+        y = self.forward(x)
+        y_softmax = torch.log_softmax(y, dim=1)
+        best_y_idx = torch.argmax(y_softmax, dim=1).item()
+
+        return best_y_idx
+
+    def get_latent_rep(self, x):
+        x = self.block1(x)
+        x = self.maxpool(x)
+
+        x = self.block2(x)
+        x = self.maxpool(x)
+
+        x = self.block3(x)
+        x = self.maxpool(x)
+
+        x = self.block4(x)
+        x = self.maxpool(x)
+
+        x = x.flatten(start_dim=1)
+        x = self.fc1(x)
 
         return x
 
@@ -93,6 +121,18 @@ class FMRIClassifier(nn.Module):
             nn.ReLU(),
             nn.Dropout2d(p=0.5),
         )
+
+    def predict(self, x):
+        y = self.forward(x)
+        y_softmax = torch.log_softmax(y, dim=1)
+        best_y_idx = torch.argmax(y_softmax, dim=1).item()
+
+        return best_y_idx
+
+    def get_latent_rep(self, x):
+        x = self.block_1(x)
+
+        return x
 
 
 if __name__ == "__main__":

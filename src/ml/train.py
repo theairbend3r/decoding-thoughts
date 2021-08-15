@@ -14,6 +14,7 @@ def train_model(
     optimizer,
     criterion,
     device: str,
+    save_model_path: str,
 ):
     """Training loop.
 
@@ -33,6 +34,8 @@ def train_model(
         PyTorch loss function.
     device:
         CUDA identifier.
+    save_model_path:
+        Path to save the trained model weights.
 
     Returns
     -------
@@ -107,4 +110,6 @@ def train_model(
             avg_val_epoch_acc,
         )
 
+    if save_model_path:
+        torch.save(model.state_dict(), save_model_path)
     return loss_stats, acc_stats
