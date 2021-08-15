@@ -1,8 +1,12 @@
-import torch
+import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.metrics import classification_report, confusion_matrix
+
+import torch
+import torch.nn as nn
+from torch.utils.data import DataLoader
 
 
 def calc_multi_acc(y_pred: torch.tensor, y_test: torch.tensor) -> float:
@@ -114,3 +118,89 @@ def generate_score_report(y_true: list, y_pred: list, idx2class):
     plt.xlabel("Pred Output")
     plt.ylabel("True Output")
     plt.title("Confusion Matrix")
+
+
+def get_latent_emb_per_class(
+    model: nn.Module, dataloader: DataLoader, class2idx: dict, idx2class: dict
+) -> dict:
+    """
+    Get latent embedding divided by output class labels.
+
+    Parameters
+    ----------
+    model:
+        Train torch model.
+    dataloader:
+        Dataloader object.
+    class2idx:
+        Maps class to integers idx.
+    idx2class:
+        Maps integer idx to class.
+
+
+    Returns
+    -------
+    dict
+        A dictionary with keys as output labels and values
+        as a list of tensors.
+    """
+
+    # init empty dictionary for hidden emb per class.
+    latent_emb_per_class_dict = {k: [] for k in class2idx.keys()}
+
+    # populate the dict.
+    with torch.no_grad():
+        for x, y in dataloader:
+            latent_emb = model.get_latent_rep(x).squeeze()
+            latent_emb_per_class_dict[idx2class[y.item()]].append(latent_emb)
+
+    # get mean embedding value per class.
+    latent_emb_per_class_dict = {
+        k: torch.stack(latent_emb_per_class_dict[k], dim=0).mean(dim=(0, 1))
+        for k in latent_emb_per_class_dict.keys()
+    }
+
+    return latent_emb_per_class_dict
+
+
+def build_rsa_matrix(
+    latent_emb_dict_1: dict, latent_emb_dict_2: dict, class2idx: dict, plot: bool
+) -> np.ndarray:
+    """
+    Construct RSA matrix.
+
+    Parameters
+    ----------
+    latent_emb_dict_1:
+        Dictionary containing a key-value pair of output labels and tensor list.
+    latent_emb_dict_2:
+        Dictionary containing a key-value pair of output labels and tensor list.
+    class2idx:
+        Maps class to integers idx.
+    plot:
+        Boolean value that plots a heatmap if true.
+
+
+    Returns
+    -------
+    np.ndarray
+        A numpy array of plot=True.
+    """
+    latent_emb_1 = torch.stack(list(latent_emb_dict_1.values()))
+    latent_emb_2 = torch.stack(list(latent_emb_dict_2.values()))
+
+    rsa_matrix = latent_emb_1.unsqueeze(0).T @ latent_emb_2.unsqueeze(0)
+
+    if plot:
+        sns.heatmap(
+            np.array(rsa_matrix),
+            annot=True,
+            xticklabels=class2idx.keys(),
+            yticklabels=class2idx.keys(),
+        )
+        plt.title("RSA Similarity Matrix: CNN vs fMRI")
+        plt.xlabel("fMRI Model")
+        plt.ylabel("CNN Model")
+
+    else:
+        return rsa_matrix
