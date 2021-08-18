@@ -203,3 +203,16 @@ def get_class_weights(y_data: np.ndarray) -> torch.tensor:
     )
 
     return class_weights
+
+
+def count_model_params(model):
+    return sum(p.numel() for p in model.parameters())
+
+
+def calc_model_frobenius_norm(model):
+    norm = 0.0
+    for param in model.parameters():
+        norm += torch.sum(param ** 2)
+
+    norm = norm ** 0.5
+    return norm.item()

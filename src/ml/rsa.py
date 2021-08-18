@@ -1,9 +1,14 @@
 import torch
 import seaborn as sns
-import matplotlib.pyplot as plt
 from tqdm.notebook import tqdm
-from src.ml.utils import get_latent_emb_per_class
+import matplotlib.pyplot as plt
+
 from src.ml.model import StimulusClassifier
+from src.ml.utils import (
+    count_model_params,
+    calc_model_frobenius_norm,
+    get_latent_emb_per_class,
+)
 
 
 def calculate_rsm(
@@ -79,6 +84,9 @@ def calculate_rsm(
 def run_rsa(
     fmri_model, fmri_loader, fmri_config, stim_loader, stim_config, class2idx, idx2class
 ):
+    stim_vs_fmri_cosinesim_norm_list = []
+    stim_model_norm_list = []
+    stim_model_num_param_list = []
 
     # fMRI model
     fmri_rsm = calculate_rsm(
@@ -92,6 +100,7 @@ def run_rsa(
         idx2class=idx2class,
     )
 
+    # Stimulus model
     for model_name in tqdm(stim_config.model_names):
 
         stim_model = StimulusClassifier(
@@ -115,6 +124,21 @@ def run_rsa(
             idx2class=idx2class,
         )
 
+        stim_fmri_cosinesim_norm = torch.norm(
+            torch.cosine_similarity(stim_rsm, fmri_rsm)
+        ).item()
+
         print(
-            f"Norm of cosine similarity between stimulus ({model_name}) and fmri embeddings = {torch.norm(torch.cosine_similarity(stim_rsm, fmri_rsm))}"
+            f"Norm of cosine similarity between stimulus ({model_name}) and fmri embeddings = {stim_fmri_cosinesim_norm}"
         )
+
+        stim_model_norm_list.append(calc_model_frobenius_norm(stim_model))
+        stim_model_num_param_list.append(count_model_params(stim_model))
+        stim_vs_fmri_cosinesim_norm_list.append(stim_fmri_cosinesim_norm)
+
+    return (
+        stim_config.model_names,
+        stim_vs_fmri_cosinesim_norm_list,
+        stim_model_norm_list,
+        stim_model_num_param_list,
+    )

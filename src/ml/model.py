@@ -91,9 +91,16 @@ class StimulusClassifier(nn.Module):
 
         if model_name == "vgg-11":
             self.feature_extractor = models.vgg11_bn(pretrained=True)
-
         elif model_name == "resnet-50":
             self.feature_extractor = models.resnet50(pretrained=True)
+        elif model_name == "resnext50":
+            self.feature_extractor = models.resnext50_32x4d(pretrained=True)
+        elif model_name == "mobilenet_v3_large":
+            self.feature_extractor = models.mobilenet_v3_large(pretrained=True)
+        elif model_name == "densenet121":
+            self.feature_extractor = models.densenet121(pretrained=True)
+        else:
+            raise ValueError("Incorrect model name.")
 
         for param in self.feature_extractor.parameters():
             param.requires_grad = False
@@ -178,4 +185,4 @@ if __name__ == "__main__":
     print()
     print("=" * 50)
     print()
-    # summary(fmri_model, input_size=(batch_size, 8000))
+    summary(fmri_model, input_size=(batch_size, 8000))
