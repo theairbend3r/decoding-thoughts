@@ -62,7 +62,7 @@ def train_model(
 
             optimizer.zero_grad()
 
-            y_train_pred = model(x_train_batch).squeeze()
+            y_train_pred = model(x_train_batch)
 
             train_loss = criterion(y_train_pred, y_train_batch)
             train_acc = calc_multi_acc(y_train_pred, y_train_batch)

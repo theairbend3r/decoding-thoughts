@@ -2,8 +2,9 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
-from sklearn.metrics import classification_report, confusion_matrix
 
+from sklearn.metrics import classification_report, confusion_matrix
+from sklearn.utils.class_weight import compute_class_weight
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
@@ -17,7 +18,6 @@ def calc_multi_acc(y_pred: torch.tensor, y_test: torch.tensor) -> float:
         A tensor of predicted values.
     y_test:
         A tensor of actual values
-
 
     Returns
     -------
@@ -52,7 +52,7 @@ def print_log(
     )
 
 
-def plot_loss_acc_curves(loss_stats: dict, acc_stats: dict):
+def plot_loss_acc_curves(loss_stats: dict, acc_stats: dict, model_name: str):
     """Plot loss and accuracy curves.
 
     Parameters
@@ -61,6 +61,8 @@ def plot_loss_acc_curves(loss_stats: dict, acc_stats: dict):
         A dictionary with loss values and keys = "train" and "val".
     acc_stats:
         A dictionary with accuracy values and keys = "train" and "val".
+    model_name:
+        Name of model.
     """
     train_val_acc_df = (
         pd.DataFrame.from_dict(acc_stats)
@@ -79,33 +81,35 @@ def plot_loss_acc_curves(loss_stats: dict, acc_stats: dict):
     sns.lineplot(
         data=train_val_acc_df, x="epochs", y="value", hue="variable", ax=axes[0]
     )
-    axes[0].set_title("Accuracy (train/loss)")
+    axes[0].set_title("Accuracy (train/val)")
     axes[0].set_xlabel("Epochs")
-    axes[0].set_ylabel("Values")
+    axes[0].set_ylabel("Accuracy")
 
     sns.lineplot(
         data=train_val_loss_df, x="epochs", y="value", hue="variable", ax=axes[1]
     )
-    axes[1].set_title("Loss (train/loss)")
+    axes[1].set_title("Loss (train/val)")
     axes[1].set_xlabel("Epochs")
-    axes[1].set_ylabel("Values")
+    axes[1].set_ylabel("Loss")
 
-    plt.suptitle("Loss-Accuracy Curves", fontsize=18)
+    plt.suptitle(f"Loss-Accuracy Curves | {model_name}", fontsize=18)
 
 
-def generate_score_report(y_true: list, y_pred: list, idx2class):
+def generate_score_report(y_true: list, y_pred: list, idx2class, model_name: str):
     """Generates a score report.
 
     Prints the classification report and plots a confusion matrix.
 
     Parameters
     ----------
-    y_true: list
+    y_true:
         A 1-d numpy array or list of true values.
-    y_pred: list
+    y_pred:
         A 1-d numpy array or list of predicted values.
+    model_name:
+        Name of model.
     """
-    print("Classification Report:\n")
+    print(f"Classification Report | {model_name}:\n")
     print(classification_report(y_true, y_pred))
     print("\n\n")
 
@@ -117,11 +121,15 @@ def generate_score_report(y_true: list, y_pred: list, idx2class):
     sns.heatmap(df, annot=True, fmt="g", cbar=False, annot_kws={"fontsize": 14})
     plt.xlabel("Pred Output")
     plt.ylabel("True Output")
-    plt.title("Confusion Matrix")
+    plt.title(f"Confusion Matrix | {model_name}")
 
 
 def get_latent_emb_per_class(
-    model: nn.Module, dataloader: DataLoader, class2idx: dict, idx2class: dict
+    model: nn.Module,
+    dataloader: DataLoader,
+    agg_class: bool,
+    class2idx: dict,
+    idx2class: dict,
 ) -> dict:
     """
     Get latent embedding divided by output class labels.
@@ -132,11 +140,12 @@ def get_latent_emb_per_class(
         Train torch model.
     dataloader:
         Dataloader object.
+    agg_class:
+        Averages across tensors of the same class.
     class2idx:
         Maps class to integers idx.
     idx2class:
         Maps integer idx to class.
-
 
     Returns
     -------
@@ -155,52 +164,42 @@ def get_latent_emb_per_class(
             latent_emb_per_class_dict[idx2class[y.item()]].append(latent_emb)
 
     # get mean embedding value per class.
-    latent_emb_per_class_dict = {
-        k: torch.stack(latent_emb_per_class_dict[k], dim=0).mean(dim=(0, 1))
-        for k in latent_emb_per_class_dict.keys()
-    }
+    if agg_class:
+        latent_emb_per_class_dict = {
+            k: torch.stack(latent_emb_per_class_dict[k], dim=0).mean(dim=(0))
+            for k in latent_emb_per_class_dict.keys()
+        }
+
+    # get all embedding value per class.
+    else:
+        latent_emb_per_class_dict = {
+            k: torch.stack(latent_emb_per_class_dict[k], dim=0)
+            for k in latent_emb_per_class_dict.keys()
+        }
 
     return latent_emb_per_class_dict
 
 
-def build_rsa_matrix(
-    latent_emb_dict_1: dict, latent_emb_dict_2: dict, class2idx: dict, plot: bool
-) -> np.ndarray:
+def get_class_weights(y_data: np.ndarray) -> torch.tensor:
     """
-    Construct RSA matrix.
+    Get balanced weights per class for cross-entropy loss.
 
     Parameters
     ----------
-    latent_emb_dict_1:
-        Dictionary containing a key-value pair of output labels and tensor list.
-    latent_emb_dict_2:
-        Dictionary containing a key-value pair of output labels and tensor list.
-    class2idx:
-        Maps class to integers idx.
-    plot:
-        Boolean value that plots a heatmap if true.
-
+    y_data:
+        Numpy array of output class labels.
 
     Returns
     -------
-    np.ndarray
-        A numpy array of plot=True.
+    torch.tensor
+        A tensor with class weights.
     """
-    latent_emb_1 = torch.stack(list(latent_emb_dict_1.values()))
-    latent_emb_2 = torch.stack(list(latent_emb_dict_2.values()))
 
-    rsa_matrix = latent_emb_1.unsqueeze(0).T @ latent_emb_2.unsqueeze(0)
+    class_weights = torch.tensor(
+        compute_class_weight(
+            class_weight="balanced", classes=np.unique(y_data), y=y_data
+        ),
+        dtype=torch.float,
+    )
 
-    if plot:
-        sns.heatmap(
-            np.array(rsa_matrix),
-            annot=True,
-            xticklabels=class2idx.keys(),
-            yticklabels=class2idx.keys(),
-        )
-        plt.title("RSA Similarity Matrix: CNN vs fMRI")
-        plt.xlabel("fMRI Model")
-        plt.ylabel("CNN Model")
-
-    else:
-        return rsa_matrix
+    return class_weights

@@ -1,0 +1,26 @@
+{
+    "os": "Linux-5.4.0-80-generic-x86_64-with-glibc2.17",
+    "python": "3.8.11",
+    "heartbeatAt": "2021-08-17T13:27:16.181801",
+    "startedAt": "2021-08-17T13:27:13.268041",
+    "docker": null,
+    "gpu": "GeForce RTX 2060",
+    "gpu_count": 1,
+    "cpu_count": 12,
+    "cuda": null,
+    "args": [
+        "-f",
+        "/home/akshaj/.local/share/jupyter/runtime/kernel-54b282eb-391f-4cd3-ba1c-11dbe0c91478.json"
+    ],
+    "state": "running",
+    "program": "notebooks/Untitled.ipynb",
+    "root": "/home/akshaj/projects_python/decoding-thoughts",
+    "git": {
+        "remote": "https://github.com/theairbend3r/decoding-thoughts.git",
+        "commit": "573a72611bf245ad21368bca68651e6faf67d82c"
+    },
+    "email": "akshajverma7@gmail.com",
+    "host": "maverick",
+    "username": "akshaj",
+    "executable": "/home/akshaj/miniconda3/envs/decoding-thoughts/bin/python"
+}

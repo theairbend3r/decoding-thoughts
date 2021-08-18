@@ -4,6 +4,7 @@ from tqdm.notebook import tqdm
 
 import torch
 from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import WeightedRandomSampler
 
 
 class StimulusDataset(Dataset):
@@ -129,3 +130,28 @@ class FMRIDataset(Dataset):
     def __len__(self):
         assert len(self.x_data) == len(self.y_data)
         return len(self.x_data)
+
+
+def create_weighted_sampler(y_data: np.ndarray, class2idx: dict):
+    """
+    Create weighted random sampler.
+
+    Parameters
+    ----------
+    y_data:
+        The output class labels.
+    class2idx:
+        A dictionary to convert class strings to integer.
+    """
+    y_data = np.array([class2idx[t] for t in y_data])
+    class_count_list = np.array(
+        [len(np.where(y_data == t)[0]) for t in np.unique(y_data)]
+    )
+    class_weight_list = 1.0 / class_count_list
+    samples_weight_list = [class_weight_list[t] for t in y_data]
+    class_weight_tensor = torch.tensor(samples_weight_list)
+    weighted_random_sampler = WeightedRandomSampler(
+        class_weight_tensor, len(class_weight_tensor)
+    )
+
+    return weighted_random_sampler
