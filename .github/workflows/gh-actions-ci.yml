@@ -32,4 +32,4 @@ jobs:
           pip install -e .
           coverage run -m pytest -v
       - name: Upload coverage to codecov
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v1
