@@ -1,8 +1,13 @@
+"""
+Training loop.
+"""
+
+from tqdm.notebook import tqdm
+
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
 
-from tqdm.notebook import tqdm
 from src.ml.utils import calc_multi_acc, print_log
 
 
@@ -33,14 +38,14 @@ def train_model(
     criterion:
         PyTorch loss function.
     device:
-        CUDA identifier.
+        CUDA/CPU identifier.
     save_model_path:
         Path to save the trained model weights.
 
     Returns
     -------
     tuple
-        A tuple of dictionaries (loss_stats, acc_stats)
+        A tuple of dictionaries (loss_stats, acc_stats).
     """
     if type(epochs) != int:
         raise ValueError("epochs has to be an integer.")
@@ -112,4 +117,5 @@ def train_model(
 
     if save_model_path:
         torch.save(model.state_dict(), save_model_path)
+
     return loss_stats, acc_stats

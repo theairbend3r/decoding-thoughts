@@ -1,8 +1,12 @@
+"""
+Testing loop.
+"""
+
+from tqdm.notebook import tqdm
+
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
-
-from tqdm.notebook import tqdm
 
 
 def test_model(model: nn.Module, test_loader: DataLoader, device: str):
@@ -10,15 +14,15 @@ def test_model(model: nn.Module, test_loader: DataLoader, device: str):
 
     model:
         PyTorch model object.
-    train_loader:
+    test_loader:
         Dataloader for test dataset.
     device:
-        CUDA identifier.
+        CUDA/CPU identifier.
 
     Returns
     -------
     tuple
-        A tuple of lists (y_true_list, y_pred_list)
+        A tuple of lists (y_true_list, y_pred_list).
     """
     y_pred_list = []
     y_true_list = []

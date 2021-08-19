@@ -16,6 +16,7 @@ src.ml.dataset
       :nosignatures:
 
       calculate_mean_std
+      create_weighted_sampler
 
 
 
@@ -28,4 +29,5 @@ src.ml.dataset
       :template: custom-class-template.rst
       :nosignatures:
 
+      FMRIDataset
       StimulusDataset

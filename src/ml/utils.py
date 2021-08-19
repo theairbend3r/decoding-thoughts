@@ -1,13 +1,18 @@
+"""
+Utility functions for machine learning operations.
+"""
+
 import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-from sklearn.metrics import classification_report, confusion_matrix
-from sklearn.utils.class_weight import compute_class_weight
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
+
+from sklearn.metrics import classification_report, confusion_matrix
+from sklearn.utils.class_weight import compute_class_weight
 
 
 def calc_multi_acc(y_pred: torch.tensor, y_test: torch.tensor) -> float:
@@ -95,7 +100,7 @@ def plot_loss_acc_curves(loss_stats: dict, acc_stats: dict, model_name: str):
     plt.suptitle(f"Loss-Accuracy Curves | {model_name}", fontsize=18)
 
 
-def generate_score_report(y_true: list, y_pred: list, idx2class, model_name: str):
+def generate_score_report(y_true: list, y_pred: list, idx2class: dict, model_name: str):
     """Generates a score report.
 
     Prints the classification report and plots a confusion matrix.
@@ -205,14 +210,42 @@ def get_class_weights(y_data: np.ndarray) -> torch.tensor:
     return class_weights
 
 
-def count_model_params(model):
+def count_model_params(model: nn.Module) -> int:
+    """
+    Count the number of parameters in a model.
+
+    Parameters
+    ----------
+    model:
+        Pytorch model.
+
+    Returns
+    -------
+    int
+        Number of parameters in the model.
+    """
+
     return sum(p.numel() for p in model.parameters())
 
 
-def calc_model_frobenius_norm(model):
+def calc_model_frobenius_norm(model: nn.Module) -> float:
+    """
+    Calculate the frobenius norm of model parameters.
+
+    Parameters
+    ----------
+    model:
+        Pytorch model.
+
+    Returns
+    -------
+    float
+        Frobenius norm.
+    """
     norm = 0.0
     for param in model.parameters():
         norm += torch.sum(param ** 2)
 
     norm = norm ** 0.5
+
     return norm.item()

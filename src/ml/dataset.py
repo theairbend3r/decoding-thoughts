@@ -1,3 +1,7 @@
+"""
+Functions for dataset processing.
+"""
+
 import numpy as np
 from PIL import Image
 from tqdm.notebook import tqdm
@@ -20,7 +24,7 @@ class StimulusDataset(Dataset):
     img_transforms:
         A dictionary of torchvision transforms.
     class2idx:
-        A dictionary that maps class string to integers.
+        A mapping between class and it's corresponding integer idx.
 
     Attributes
     ----------
@@ -32,7 +36,7 @@ class StimulusDataset(Dataset):
     img_transforms: dict
         A dictionary of torchvision transforms.
     class2idx: dict
-        A dictionary that maps class string to integers.
+        A mapping between class and it's corresponding integer idx.
     """
 
     def __init__(
@@ -67,7 +71,7 @@ def calculate_mean_std(dataset: Dataset):
     Parameters
     ----------
     dataset:
-        Pytorch dataset object.
+        PyTorch dataset object.
 
     Returns
     -------
@@ -134,7 +138,7 @@ class FMRIDataset(Dataset):
 
 def create_weighted_sampler(y_data: np.ndarray, class2idx: dict):
     """
-    Create weighted random sampler.
+    Create a weighted random sampler.
 
     Parameters
     ----------
@@ -144,12 +148,17 @@ def create_weighted_sampler(y_data: np.ndarray, class2idx: dict):
         A dictionary to convert class strings to integer.
     """
     y_data = np.array([class2idx[t] for t in y_data])
+
     class_count_list = np.array(
         [len(np.where(y_data == t)[0]) for t in np.unique(y_data)]
     )
+
     class_weight_list = 1.0 / class_count_list
+
     samples_weight_list = [class_weight_list[t] for t in y_data]
+
     class_weight_tensor = torch.tensor(samples_weight_list)
+
     weighted_random_sampler = WeightedRandomSampler(
         class_weight_tensor, len(class_weight_tensor)
     )

@@ -1,9 +1,9 @@
-src.ml.StimulusClassifierConfig
-===============================
+src.ml.dataset.FMRIDataset
+==========================
 
-.. currentmodule:: src.ml
+.. currentmodule:: src.ml.dataset
 
-.. autoclass:: StimulusClassifierConfig
+.. autoclass:: FMRIDataset
    :members:
    :show-inheritance:
    :inherited-members:

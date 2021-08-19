@@ -1,88 +1,16 @@
+"""
+Model definitions for fMRI and Stimulus dataset.
+"""
+
 import torch
 import torch.nn as nn
-from src.ml import StimulusClassifierConfig, FMRIClassifierConfig
 import torchvision.models as models
 
-# class StimulusClassifier(nn.Module):
-#     """Torch cnn model."""
-
-#     def __init__(self, num_channel, num_classes):
-#         super(StimulusClassifier, self).__init__()
-
-#         self.config = StimulusClassifierConfig()
-
-#         self.feature_extractor = nn.Sequential(
-#             self.conv_block(num_channel, 64),
-#             self.transition_block(64, 32),
-#             self.conv_block(32, 64),
-#             self.transition_block(64, 32),
-#             self.conv_block(32, 64),
-#             self.transition_block(64, 32),
-#             self.conv_block(32, 64),
-#             self.transition_block(64, 32),
-#             nn.AvgPool2d(kernel_size=8),
-#         )
-
-#         self.fc1 = nn.Linear(in_features=32, out_features=self.config.latent_emb_size)
-#         self.fc2 = nn.Linear(
-#             in_features=self.config.latent_emb_size, out_features=num_classes
-#         )
-
-#         self.relu = nn.ReLU()
-
-#     def conv_block(self, c_in, c_out):
-#         return nn.Sequential(
-#             nn.Conv2d(in_channels=c_in, out_channels=c_in, kernel_size=3, padding=1),
-#             nn.BatchNorm2d(num_features=c_in),
-#             nn.ReLU(),
-#             nn.Dropout2d(p=0.1),
-#             nn.Conv2d(in_channels=c_in, out_channels=c_out, kernel_size=3, padding=1),
-#             nn.BatchNorm2d(num_features=c_out),
-#             nn.ReLU(),
-#             nn.Dropout2d(p=0.1),
-#         )
-
-#     def transition_block(self, c_in, c_out):
-#         return nn.Sequential(
-#             # Pointwise Convolution to reduce number of channels
-#             nn.Conv2d(in_channels=c_in, out_channels=c_out, kernel_size=(1, 1)),
-#             # Depthwise Convolution with stride=2 to reduce the channel size to half
-#             nn.Conv2d(
-#                 in_channels=c_out,
-#                 out_channels=c_out,
-#                 kernel_size=(3, 3),
-#                 padding=1,
-#                 stride=2,
-#                 groups=c_out,
-#                 bias=False,
-#             ),
-#         )
-
-#     def forward(self, x):
-#         x = self.feature_extractor(x)
-#         x = x.flatten(start_dim=1)
-#         x = self.relu(self.fc1(x))
-#         x = self.fc2(x)
-
-#         return x
-
-#     def predict(self, x):
-#         y = self.forward(x)
-#         y_softmax = torch.log_softmax(y, dim=1)
-#         best_y_idx = torch.argmax(y_softmax, dim=1).item()
-
-#         return best_y_idx
-
-#     def get_latent_rep(self, x):
-#         x = self.feature_extractor(x)
-#         x = x.flatten(start_dim=1)
-#         x = self.fc1(x)
-
-#         return x
+from src.ml.config import StimulusClassifierConfig, FMRIClassifierConfig
 
 
 class StimulusClassifier(nn.Module):
-    """Torch cnn model."""
+    """Torch CNN model."""
 
     def __init__(self, num_classes, model_name):
         super(StimulusClassifier, self).__init__()
@@ -133,7 +61,7 @@ class StimulusClassifier(nn.Module):
 
 
 class FMRIClassifier(nn.Module):
-    """Torch dnn model."""
+    """Torch DNN model."""
 
     def __init__(self, num_features, num_classes):
         super(FMRIClassifier, self).__init__()

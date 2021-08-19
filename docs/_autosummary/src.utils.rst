@@ -26,4 +26,4 @@ src.utils
    :template: custom-module-template.rst
    :recursive:
 
-   src.utils.utils
+   src.utils.util

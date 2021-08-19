@@ -1,6 +1,7 @@
 """
-Module to summarise data.
+Functions to summarise data.
 """
+
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt

@@ -1,3 +1,3 @@
 """
-Utility module.
+Module with utility functions.
 """
