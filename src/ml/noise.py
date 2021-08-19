@@ -1,12 +1,14 @@
 """
 Function for noise analysis.
 """
+import gc
+
+from tqdm.notebook import tqdm
+import matplotlib.pyplot as plt
+from sklearn.metrics import accuracy_score
 
 import torch
 from torch.utils.data import DataLoader
-
-from tqdm.notebook import tqdm
-from sklearn.metrics import accuracy_score
 
 import albumentations as A
 from albumentations.pytorch import ToTensorV2
@@ -18,7 +20,7 @@ from src.ml.model import StimulusClassifier
 from src.utils.util import prepare_stimulus_data
 
 
-def stim_noise_test(blur_level_list, config, class2idx) -> list:
+def stim_noise_test(blur_level_list, config, class2idx, idx2class) -> list:
     """
     Runs the test loop with increasing levels of noise in the
     dataset.
@@ -31,6 +33,8 @@ def stim_noise_test(blur_level_list, config, class2idx) -> list:
         Configuration object (for fmri or stmim).
     class2idx:
         A mapping between class and it's corresponding integer idx.
+    idx2class:
+        Reverse mapping of class2idx.
 
     Returns
     -------
@@ -52,6 +56,40 @@ def stim_noise_test(blur_level_list, config, class2idx) -> list:
 
     # Calculate blur level for all models given a blur value.
     for blur in blur_level_list:
+
+        # visualize blurred image
+        og_transform = A.Compose(
+            [
+                A.Blur(blur_limit=blur, p=1),
+                A.Normalize(mean=(0, 0, 0), std=(1, 1, 1)),
+                ToTensorV2(),
+            ]
+        )
+
+        og_dataset = StimulusDataset(
+            x_data=x_test,
+            y_data=y_test,
+            img_transform=og_transform,
+            class2idx=class2idx,
+        )
+
+        # plot blurred images as example
+        rows = 2
+        cols = 3
+        img_idx = 0
+        fig, axes = plt.subplots(nrows=rows, ncols=cols, figsize=(20, 15))
+        for i in range(rows):
+            for j in range(cols):
+                if img_idx < len(og_dataset):
+                    axes[i, j].imshow(og_dataset[img_idx][0].permute(1, 2, 0))
+                    axes[i, j].set_title(
+                        f"Image Class= {idx2class[og_dataset[img_idx][1].item()]} | Blur Level = {blur}"
+                    )
+
+                    img_idx += 1
+
+        del og_dataset, og_transform
+        gc.collect()
 
         # define image transform
         blur_transform = A.Compose(
@@ -98,5 +136,8 @@ def stim_noise_test(blur_level_list, config, class2idx) -> list:
 
             # append values to list and return list
             blur_model_acc_list.append((blur, model_name, model_acc))
+
+            del model
+            gc.collect()
 
     return blur_model_acc_list

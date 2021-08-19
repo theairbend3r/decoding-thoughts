@@ -67,23 +67,27 @@ class FMRIClassifier(nn.Module):
         super(FMRIClassifier, self).__init__()
 
         self.config = FMRIClassifierConfig()
-        self.fc1 = self.lin_block(f_in=num_features, f_out=512)
-        self.fc2 = self.lin_block(f_in=512, f_out=self.config.latent_emb_size)
-        self.fc3 = nn.Linear(
+        self.feature_extractor = nn.Sequential(
+            self.lin_block(f_in=num_features, f_out=512),
+            self.lin_block(f_in=512, f_out=512),
+        )
+        self.fc1 = self.lin_block(f_in=512, f_out=self.config.latent_emb_size)
+        self.fc2 = nn.Linear(
             in_features=self.config.latent_emb_size, out_features=num_classes
         )
 
     def lin_block(self, f_in, f_out):
         return nn.Sequential(
             nn.Linear(in_features=f_in, out_features=f_out),
+            nn.BatchNorm1d(f_out),
             nn.ReLU(),
-            nn.Dropout(0.5),
+            nn.Dropout(0.6),
         )
 
     def forward(self, x):
+        x = self.feature_extractor(x)
         x = self.fc1(x)
         x = self.fc2(x)
-        x = self.fc3(x)
 
         return x
 
@@ -95,8 +99,8 @@ class FMRIClassifier(nn.Module):
         return best_y_idx
 
     def get_latent_rep(self, x):
+        x = self.feature_extractor(x)
         x = self.fc1(x)
-        x = self.fc2(x)
 
         return x
 
@@ -104,13 +108,12 @@ class FMRIClassifier(nn.Module):
 if __name__ == "__main__":
     from torchinfo import summary
 
-    stim_model_1 = StimulusClassifier(num_classes=5, model_name="vgg-11")
-    stim_model_2 = StimulusClassifier(num_classes=5, model_name="resnet-50")
-    fmri_model = FMRIClassifier(num_features=8000, num_classes=5)
-    batch_size = 16
-    summary(stim_model_1, input_size=(batch_size, 3, 128, 128))
-    summary(stim_model_2, input_size=(batch_size, 3, 128, 128))
+    fmri_model = FMRIClassifier(num_features=8000, num_classes=3)
+    summary(fmri_model, input_size=(2, 8000))
     print()
     print("=" * 50)
     print()
-    summary(fmri_model, input_size=(batch_size, 8000))
+    # stim_model_1 = StimulusClassifier(num_classes=3, model_name="vgg-11")
+    # stim_model_2 = StimulusClassifier(num_classes=3, model_name="resnet-50")
+    # summary(stim_model_1, input_size=(2, 3, 128, 128))
+    # summary(stim_model_2, input_size=(2, 3, 128, 128))

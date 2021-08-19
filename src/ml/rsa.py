@@ -1,6 +1,8 @@
 """
 Functions for representation similarity analysis.
 """
+import gc
+import numpy as np
 
 import seaborn as sns
 from tqdm.notebook import tqdm
@@ -174,12 +176,23 @@ def run_rsa(
 
     # fMRI model
     # fmri_rsm
-    _ = calculate_rsm(
+    fmri_rsm = calculate_rsm(
         model=fmri_model,
         dataloader=fmri_loader,
         plot_title="fMRI Classifier",
         config=fmri_config,
         agg_class=False,
+        plot=True,
+        class2idx=class2idx,
+        idx2class=idx2class,
+    )
+
+    _ = calculate_rsm(
+        model=fmri_model,
+        dataloader=fmri_loader,
+        plot_title="fMRI Classifier | Aggregated Class | ",
+        config=fmri_config,
+        agg_class=True,
         plot=True,
         class2idx=class2idx,
         idx2class=idx2class,
@@ -202,7 +215,7 @@ def run_rsa(
 
         # calculate rsm matrix for stimulus embeddings
         # stim_rsm
-        _ = calculate_rsm(
+        stim_rsm = calculate_rsm(
             model=stim_model,
             dataloader=stim_loader,
             plot_title=f"Stimulus Classifier | {model_name.capitalize()}",
@@ -213,9 +226,27 @@ def run_rsa(
             idx2class=idx2class,
         )
 
+        _ = calculate_rsm(
+            model=stim_model,
+            dataloader=stim_loader,
+            plot_title=f"Stimulus Classifier | Aggregated Class | {model_name.capitalize()}",
+            config=stim_config,
+            agg_class=True,
+            plot=True,
+            class2idx=class2idx,
+            idx2class=idx2class,
+        )
+
+        print(
+            f"Correlation betweeb {model_name} and fMRI - {np.corrcoef(np.array(stim_rsm).flatten(), np.array(fmri_rsm).flatten())[0, 1]}"
+        )
+
         # append items to list for returning
         stim_model_norm_list.append(calc_model_frobenius_norm(stim_model))
         stim_model_num_param_list.append(count_model_params(stim_model))
+
+        del stim_model
+        gc.collect()
 
     return (
         stim_config.model_names,

@@ -56,7 +56,7 @@ class FMRIClassifierConfig:
         self.roi_select_list = [1, 2, 3, 4, 5, 6, 7]
         self.class_ignore_list = ["person", "fungus", "fruit", "plant", "entity"]
         self.label_level = 0
-        self.epochs = 50
-        self.learning_rate = 0.001
+        self.epochs = 10
+        self.learning_rate = 0.01
         self.batch_size = 128
         self.latent_emb_size = 100
