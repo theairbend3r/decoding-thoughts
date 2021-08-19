@@ -11,6 +11,12 @@
 Welcome to Decoding Thought's documentation!
 ============================================
 
+.. image:: https://github.com/theairbend3r/decoding-thoughts/actions/workflows/gh-actions-ci.yml/badge.svg :target: https://github.com/theairbend3r/decoding-thoughts/actions/workflows/gh-actions-ci.yml
+
+.. image:: https://codecov.io/gh/theairbend3r/decoding-thoughts/branch/main/graph/badge.svg?token=XHMQYQ4MFX :target: https://codecov.io/gh/theairbend3r/decoding-thoughts
+
+.. image:: https://img.shields.io/github/license/theairbend3r/decoding-thoughts?color=lightgrey   :alt: GitHub license   :target: https://github.com/theairbend3r/decoding-thoughts/blob/main/LICENSE
+
 Decoding visual stimulus from brain fMRI using methods from computational neuroscience and deep learning.
 
 
