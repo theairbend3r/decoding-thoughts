@@ -30,10 +30,16 @@ def test_model(model: nn.Module, test_loader: DataLoader, device: str):
             y_test_pred = model(x_batch)
             _, y_pred_tag = torch.max(y_test_pred, dim=1)
 
-            for i in y_pred_tag.squeeze().cpu().numpy().tolist():
-                y_pred_list.append(i)
+            # if batch size is 1, direclty append to arrays.
+            # else
+            if y_batch.shape[0] == 1:
+                y_pred_list.append(y_pred_tag.squeeze().cpu().item())
+                y_true_list.append(y_batch.squeeze().cpu().item())
+            else:
+                for i in y_pred_tag.squeeze().cpu().numpy().tolist():
+                    y_pred_list.append(i)
 
-            for i in y_batch.squeeze().cpu().numpy().tolist():
-                y_true_list.append(i)
+                for i in y_batch.squeeze().cpu().numpy().tolist():
+                    y_true_list.append(i)
 
     return y_true_list, y_pred_list

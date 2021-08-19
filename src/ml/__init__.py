@@ -16,10 +16,10 @@ class StimulusClassifierConfig:
         self.latent_emb_size = 100
         self.model_names = [
             "vgg-11",
-            "resnet-50",
             "resnext50",
-            "mobilenet_v3_large",
+            "resnet-50",
             "densenet121",
+            "mobilenet_v3_large",
         ]
 
         self.img_transform = {
