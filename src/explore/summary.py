@@ -52,6 +52,8 @@ def plot_hierarchical_labels(
         labels = all_data["train_labels"][:, label_level]
     elif label_type == "test":
         labels = all_data["test_labels"][:, label_level]
+    else:
+        raise ValueError("label_type can only be 'train' or 'test'.")
 
     if plot:
         plt.figure(figsize=fig_size)

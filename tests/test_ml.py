@@ -1,3 +1,5 @@
+import pytest
+
 import torch
 import numpy as np
 
@@ -141,8 +143,15 @@ class TestDataset:
 
 class TestModel:
     def test_stimulus_model(self):
+
+        # model name has specific set of values
+        with pytest.raises(ValueError):
+            stimulus_model = StimulusClassifier(
+                num_classes=num_output_classes, model_name="lmao"
+            )
+
         stimulus_model = StimulusClassifier(
-            num_channel=3, num_classes=num_output_classes
+            num_classes=num_output_classes, model_name="resnet-50"
         )
 
         # model output shape should be (batch_size, num_classes)

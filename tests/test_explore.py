@@ -9,12 +9,18 @@ class TestSummary:
     def test_plot_hierarchical_labels(self):
         # label_level can only be one of - 0, 1, 2, 3
         with pytest.raises(ValueError):
-            plot_hierarchical_labels(all_data=dict(), label_level=5)
+            plot_hierarchical_labels(all_data=dict(), label_type="train", label_level=5)
+
+        # label_type can only be "train" or "test"
+        with pytest.raises(ValueError):
+            plot_hierarchical_labels(all_data=dict(), label_type="lmao", label_level=2)
 
         # shape of output must be 1750
         assert (
             len(
-                plot_hierarchical_labels(all_data=dummy_data, label_level=0, plot=False)
+                plot_hierarchical_labels(
+                    all_data=dummy_data, label_type="train", label_level=0, plot=False
+                )
             )
             == 1750
         )
@@ -22,7 +28,9 @@ class TestSummary:
         # type of output must by np.ndarray
         assert (
             type(
-                plot_hierarchical_labels(all_data=dummy_data, label_level=0, plot=False)
+                plot_hierarchical_labels(
+                    all_data=dummy_data, label_type="train", label_level=0, plot=False
+                )
             )
             == np.ndarray
         )
