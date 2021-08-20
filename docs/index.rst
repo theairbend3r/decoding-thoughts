@@ -23,6 +23,9 @@ Welcome to Decoding Thought's documentation!
 .. image:: https://img.shields.io/badge/code%20style-black-black
    :target: https://img.shields.io/badge/code%20style-black-black
 
+.. image:: https://readthedocs.org/projects/decoding-thoughts/badge/?version=latest
+   :target: https://decoding-thoughts.readthedocs.io/en/latest/?badge=latest
+   :alt: Documentation Status
 
 Decoding visual stimulus from brain fMRI data and comparing its learned representations with ones decoded by convolutional neural networks using methods from computational neuroscience and deep learning.
 
