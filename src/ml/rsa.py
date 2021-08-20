@@ -171,6 +171,7 @@ def run_rsa(
         (stim_config.model_names, stim_model_norm_list, stim_model_num_param_list)
     """
 
+    stim_vs_fmri_rsm_corr = []
     stim_model_norm_list = []
     stim_model_num_param_list = []
 
@@ -237,11 +238,12 @@ def run_rsa(
             idx2class=idx2class,
         )
 
-        print(
-            f"Correlation betweeb {model_name} and fMRI - {np.corrcoef(np.array(stim_rsm).flatten(), np.array(fmri_rsm).flatten())[0, 1]}"
-        )
-
         # append items to list for returning
+        stim_vs_fmri_rsm_corr.append(
+            np.corrcoef(np.array(stim_rsm).flatten(), np.array(fmri_rsm).flatten())[
+                0, 1
+            ]
+        )
         stim_model_norm_list.append(calc_model_frobenius_norm(stim_model))
         stim_model_num_param_list.append(count_model_params(stim_model))
 
@@ -250,6 +252,7 @@ def run_rsa(
 
     return (
         stim_config.model_names,
+        stim_vs_fmri_rsm_corr,
         stim_model_norm_list,
         stim_model_num_param_list,
     )

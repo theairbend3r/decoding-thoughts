@@ -1,7 +1,8 @@
 """
 Utility functions for machine learning operations.
 """
-
+import os
+import random
 import numpy as np
 import pandas as pd
 import seaborn as sns
@@ -249,3 +250,50 @@ def calc_model_frobenius_norm(model: nn.Module) -> float:
     norm = norm ** 0.5
 
     return norm.item()
+
+
+def calc_blur_acc_change(df: pd.DataFrame, model_names: list) -> list:
+    """
+    Calculate the difference in accuracy between min and max
+    blur levels for all Stimulus models.
+
+    Parameters
+    ----------
+    df:
+        Pandas dataframe with columns as (blur, model, accuracy).
+    model_names:
+        List of model names.
+
+    Returns
+    -------
+    list
+        A list of accuracy difference.
+    """
+    min_blur = min(df["blur"])
+    max_blur = max(df["blur"])
+
+    acc_diff_list = []
+
+    for mn in model_names:
+        min_blur_acc = (
+            df[(df["model"] == mn) & (df["blur"] == min_blur)]["accuracy"].item() * 100
+        )
+
+        max_blur_acc = (
+            df[(df["model"] == mn) & (df["blur"] == max_blur)]["accuracy"].item() * 100
+        )
+
+        print(f"Model {mn: <20}: {min_blur_acc: <15}, {max_blur_acc: >12}")
+        acc_diff_list.append(min_blur_acc - max_blur_acc)
+
+    return acc_diff_list
+
+
+def set_seed(seed):
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+    np.random.seed(seed)
+    random.seed(seed)
+    os.environ["PYTHONHASHSEED"] = str(seed)
