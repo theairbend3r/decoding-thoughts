@@ -29,6 +29,8 @@ Welcome to Decoding Thought's documentation!
 
 Decoding visual stimulus from brain fMRI data and comparing its learned representations with ones decoded by convolutional neural networks using methods from computational neuroscience and deep learning.
 
+.. figure:: ./decoding-thoughts.png
+   :alt: Decoding Thoughts
 
 Installation
 ------------
