@@ -20,11 +20,18 @@ Create environment.
 conda env create -f environment.yml
 ```
 
-Install packages.
+Install dependencies.
 
 ```
 pip install -r requirements.txt
 ```
+
+Install package.
+
+```
+pip install -e . # or make install
+```
+
 
 ## Content
 
