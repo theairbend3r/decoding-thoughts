@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/theairbend3r/decoding-thoughts/actions/workflows/gh-actions-ci.yml/badge.svg)](https://github.com/theairbend3r/decoding-thoughts/actions/workflows/gh-actions-ci.yml) [![codecov](https://codecov.io/gh/theairbend3r/decoding-thoughts/branch/main/graph/badge.svg?token=XHMQYQ4MFX)](https://codecov.io/gh/theairbend3r/decoding-thoughts) ![license](https://img.shields.io/github/license/theairbend3r/decoding-thoughts?color=lightgrey) ![black](https://img.shields.io/badge/code%20style-black-black) [![Documentation Status](https://readthedocs.org/projects/decoding-thoughts/badge/?version=latest)](https://decoding-thoughts.readthedocs.io/en/latest/?badge=latest)
 
-Decoding visual stimulus from brain fMRI data and comparing its learned representations with ones decoded by convolutional neural networks using methods from computational neuroscience and deep learning.
+Investigating the difference in robustness between decoded brain (fMRI) representations versus those learned by a convolutional neural network using methods from computational neuroscience and deep learning.
 
 ![decoding-thoughts](./docs/decoding-thoughts.png)
 
